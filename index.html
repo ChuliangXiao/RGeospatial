@@ -129,7 +129,7 @@ $(document).ready(function () {
 <p>The script shows a R example of geospatial masking, plotting precipitation of a gridded Lambert netCDF file with a watershed in polygon shapefile on Google Map.</p>
 <div id="library" class="section level3">
 <h3>Library</h3>
-<pre class="r"><code>xlib  &lt;- c(&quot;ncdf4&quot;,&quot;raster&quot;, &quot;ggmap&quot;, &quot;rgdal&quot;, &quot;rgeos&quot;)
+<pre class="r"><code>xlib  &lt;- c(&quot;tidyverse&quot;,&quot;ncdf4&quot;,&quot;raster&quot;, &quot;ggmap&quot;, &quot;rgdal&quot;, &quot;rgeos&quot;)
 lib   &lt;- lapply(xlib, library, character.only = TRUE) # load the required packages</code></pre>
 </div>
 <div id="read-in-gridded-netcdf-file-for-the-maumee-river-basin" class="section level3">
@@ -139,14 +139,14 @@ fname   &lt;- paste0(&quot;Precip/&quot;, &quot;201401010000.PRECIP_FORCING.nc&q
 fnc     &lt;- nc_open(fname)</code></pre>
 </div>
 <div id="get-coordinate" class="section level3">
-<h3>get Coordinate</h3>
+<h3>Get Coordinate</h3>
 <pre class="r"><code>lon &lt;- ncvar_get(fnc, varid = &quot;lon&quot;)
 lat &lt;- ncvar_get(fnc, varid = &quot;lat&quot;)
 # get varaible precipitation rate
 PR  &lt;- ncvar_get(fnc, varid = &quot;precip_rate&quot;)</code></pre>
 </div>
 <div id="get-projection" class="section level3">
-<h3>get Projection</h3>
+<h3>Get Projection</h3>
 <pre class="r"><code>library(rwrfhydro)
 proj4 &lt;- GetProj(geoFile) </code></pre>
 </div>
@@ -157,13 +157,13 @@ coordinates(spPR) &lt;- ~ lon+lat
 proj4string(spPR) = CRS(proj4)</code></pre>
 </div>
 <div id="rasterization" class="section level3">
-<h3>rasterization</h3>
+<h3>Rasterization</h3>
 <pre class="r"><code>r             &lt;- raster(ncols = ncol(lat),nrows = nrow(lat))
 extent(r)     &lt;- extent(spPR)
 rPR           &lt;- rasterize(coordinates(spPR), r, spPR$conc)</code></pre>
 </div>
 <div id="read-maumee-river-shapfile" class="section level3">
-<h3>read Maumee River Shapfile</h3>
+<h3>Read Maumee River Shapfile</h3>
 <pre class="r"><code>rMaumee       &lt;- readOGR(dsn = &quot;MaumeeRiverShapefile&quot;, layer = &quot;Maumee_Output&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
 ## Source: &quot;MaumeeRiverShapefile&quot;, layer: &quot;Maumee_Output&quot;
