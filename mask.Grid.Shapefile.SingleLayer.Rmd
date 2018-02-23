@@ -8,14 +8,14 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-The script shows a R example of geospatial masking, plotting precipitation of a gridded Lambert netCDF file with a watershed in polygon shapefile on Google Map.
+The script shows a R example of geospatial masking in the Maumee River basin, plotting precipitation of a gridded Lambert netCDF file with a watershed in polygon shapefile on Google Map.
 
 ### Library
 ```{r  warning = FALSE, message = FALSE}
 xlib  <- c("tidyverse","ncdf4","raster", "ggmap", "rgdal", "rgeos")
 lib   <- lapply(xlib, library, character.only = TRUE) # load the required packages
 ```
-### read in gridded NetCDF file for the Maumee River basin
+### Read gridded NetCDF file
 ```{r}
 geoFile <- "geo_em.d02.nc"
 fname   <- paste0("Precip/", "201401010000.PRECIP_FORCING.nc")
@@ -55,14 +55,13 @@ rMaumee.proj  <- spTransform(rMaumee, CRSobj = CRS(proj4string(rPR)))
 
 ### Plot raster layers and add Maumee polygon
 ```{r}
-plot(rPR*1e4)
+#par(mar = c(0.1, 0.1, 0.1, 0.1 ))
+plot(rPR*1e4, asp = 1)
 plot(rMaumee.proj, add = T)
 ```
-
-
 ### Raster to Polygon
 ```{r}
-r <- projectRaster(rPR, crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+r   <- projectRaster(rPR, crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 rtp <- rasterToPolygons(r)
 ```
 ### Google Basemap
