@@ -1,0 +1,60 @@
+---
+title: "RSpatial-Mask"
+author: "Chuliang Xiao"
+date: "February 23, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Library
+```{r  warning = FALSE, message = FALSE}
+xlib <- c("ncdf4", "ncdf4.helpers", "PCICt", "tidyverse", 
+          "raster", "ggmap", "rgdal", "rgeos", "maptools", "tmap")
+lib <- lapply(xlib, library, character.only = TRUE) # load the required packages
+```
+### read in gridded NetCDF file
+```{r}
+fname   <- paste0("Precip/", "201401010000.PRECIP_FORCING.nc")
+geoFile <- "geo_em.d02.nc"
+fnc     <- nc_open(fname)
+```
+
+### get Coordinate 
+```{r}
+lon <- ncvar_get(fnc, varid = "lon")
+lat <- ncvar_get(fnc, varid = "lat")
+# get varaible precipitation rate
+PR  <- ncvar_get(fnc, varid = "precip_rate")
+```
+### get Projection
+```{r}
+library(rwrfhydro)
+proj4 <- GetProj(geoFile) 
+```
+### Coordinates
+```{r}
+spPR  <- data.frame(lon=as.vector(lon), lat=as.vector(lat), conc=as.vector(PR))
+coordinates(spPR) <- ~ lon+lat
+proj4string(spPR) = CRS(proj4)
+```
+### read Maumee River Shapfile
+```{r}
+rMaumee       <- readOGR(dsn = "MaumeeRiverShapefile", layer = "Maumee_Output")
+#rMaumee.proj <- spTransform(rMaumee, CRSobj=CRS(proj4))
+#spPR.proj    <- spTransform(spPR, CRSobj=CRS(proj4string(rMaumee)))
+```
+### Projection
+```{r}
+r             <- raster(ncols=ncol(lat),nrows=nrow(lat))
+extent(r)     <- extent(spPR)
+rPR           <- rasterize(coordinates(spPR), r, spPR$conc)
+rMaumee.proj  <- spTransform(rMaumee, CRSobj=CRS(proj4string(rPR)))
+```
+### Plot
+```{r}
+plot(rPR)
+plot(rMaumee.proj, add = T)
+```
